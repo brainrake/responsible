@@ -1,0 +1,19 @@
+package topdown
+version = "1.0.0"
+executable = hello
+main = Examples.Hello
+modules = 
+    Http.Method,
+    Http.Header,
+    Http.Request,
+    Http.Error,
+    Http.Response,
+    Http.Jwt,
+    Http.NetworkAddress,
+    Control.App.Http.Route,
+    Control.App.Http.Api,
+    Control.App.Http.Auth,
+    Control.App.Http.Server
+          
+
+depends = base,contrib,network
