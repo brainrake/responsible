@@ -8,7 +8,6 @@ import Http.Encode
 import Http.Response
 import Http.Jwt
 import Control.App
-import Control.App.Http.Exception
 import Control.App.Http.Api
 
 
