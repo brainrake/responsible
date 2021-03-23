@@ -1,7 +1,6 @@
 module Http.Response
 
 import Data.List
-import Pipes
 import Http.Header
 import Http.Encode
 import Language.JSON

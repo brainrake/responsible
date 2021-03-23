@@ -1,6 +1,5 @@
 module Examples.Conduit
 
-import Pipes
 import Data.Maybe
 import Data.List
 import Language.JSON
@@ -10,7 +9,7 @@ import Network.Socket
 import Http
 
 
-hello : Has [HttpRequest, Console] e =>  Api e
+hello : Has [HttpRequest, Console ] e =>  Api e
 hello = do
     r <- get Request
     putStrLn "Hello, Console!"

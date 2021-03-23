@@ -1,6 +1,5 @@
 module Http.Jwt
 
-import Pipes
 import Data.List
 import Data.Maybe
 import Http.Header
