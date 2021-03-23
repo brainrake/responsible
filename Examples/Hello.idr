@@ -8,12 +8,10 @@ import Http
 
 hello : Has [RequestState, Console] e => Api e
 hello = do
-    pure $ ok "Hello"
     r <- get Request
     putStrLn "Hello, Console!"
     printLn r.headers
-    
-    header ("test", "test") $ do 
+    header ("test", "test") $ do
         pure $ ok $ "Hello, Http! " ++ r.fullPath
  
 
