@@ -10,8 +10,8 @@ import Control.App
 
 
 public export
-RequestState : List Error -> Type
-RequestState e =
+HttpRequest : List Error -> Type
+HttpRequest e =
     State Request Request e
 
 
@@ -22,7 +22,7 @@ Api e =
 
 
 export
-method : RequestState e => Method -> Api e -> Api e
+method : HttpRequest e => Method -> Api e -> Api e
 method m api = do
     request <- get Request
     if request.method == m
@@ -31,25 +31,25 @@ method m api = do
 
 
 export
-get : RequestState e => Api e -> Api e
+get : HttpRequest e => Api e -> Api e
 get =
     method Get
 
 
 export
-post : RequestState e => Api e -> Api e
+post : HttpRequest e => Api e -> Api e
 post =
     method Post
 
 
 export
-put : RequestState e => Api e -> Api e
+put : HttpRequest e => Api e -> Api e
 put =
     method Put
 
 
 export
-delete : RequestState e => Api e -> Api e
+delete : HttpRequest e => Api e -> Api e
 delete =
     method Delete
 

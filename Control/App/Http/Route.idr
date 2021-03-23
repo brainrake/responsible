@@ -21,7 +21,7 @@ handleNoRoute api =
     
 
 export
-apis : Has [Exception NoRoute, RequestState ] e => List (Api e) -> Api e
+apis : Has [Exception NoRoute, HttpRequest ] e => List (Api e) -> Api e
 apis [] =
     throw MkNoRoute
 apis (x::xs) =
@@ -35,7 +35,7 @@ middlewares xs api =
 
 
 export
-route : Has [RequestState, Exception NoRoute] e => String -> Api e -> Api e
+route : Has [HttpRequest, Exception NoRoute] e => String -> Api e -> Api e
 route str api = do
     request <- get Request
     if ("/" ++ str) `isPrefixOf` request.path then do
@@ -46,7 +46,7 @@ route str api = do
 
 
 export
-param : Has [ RequestState, Exception NoRoute ] e => (String -> Api e) -> Api e
+param : Has [ HttpRequest, Exception NoRoute ] e => (String -> Api e) -> Api e
 param f = do
     request <- get Request
     let parser = char '/' *> takeWhile1 (/= '/')

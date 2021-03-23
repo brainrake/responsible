@@ -6,7 +6,7 @@ import Control.App.Console
 import Http
 
 
-hello : Has [RequestState, Console] e => Api e
+hello : Has [HttpRequest, Console] e => Api e
 hello = do
     r <- get Request
     putStrLn "Hello, Console!"
@@ -20,7 +20,7 @@ greet name =
     pure $ ok $ "Hello, " ++ name ++ "!"
 
 
-api : Has [RequestState, Exception NoRoute, Console ] e => Api e
+api : Has [HttpRequest, Exception NoRoute, Console ] e => Api e
 api =
     route "hello" $ apis
         [ get hello

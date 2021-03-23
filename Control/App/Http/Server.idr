@@ -17,7 +17,7 @@ import Network.Socket
 
 
 handle : 
-    (Has [ RequestState ] e => Api (NoRoute :: e))
+    (Has [ HttpRequest ] e => Api (NoRoute :: e))
     -> Socket 
     -> SocketAddress 
     -> (Has [PrimIO] e => App e ())
@@ -43,7 +43,7 @@ handle api sock addr = do
 
 loop : 
     Socket 
-    -> (Has [ RequestState ] e => Api (NoRoute :: e)) 
+    -> (Has [ HttpRequest ] e => Api (NoRoute :: e)) 
     -> Has [ PrimIO ] e => App {l=MayThrow} e ()
 loop listenSock api = do
     Right (sock, addr) <- primIO $ accept listenSock
@@ -55,7 +55,7 @@ loop listenSock api = do
 export
 serve :  
     NetworkAddress 
-    -> (Has [ RequestState ] e => Api (NoRoute :: e)) 
+    -> (Has [ HttpRequest ] e => Api (NoRoute :: e)) 
     -> (Has [ PrimIO ] e => App {l=MayThrow} e ())
 serve (addr, port) api = do
     Right sock <- primIO $ socket AF_INET Stream 0

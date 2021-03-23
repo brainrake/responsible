@@ -10,7 +10,7 @@ import Network.Socket
 import Http
 
 
-hello : Has [RequestState, Console] e =>  Api e
+hello : Has [HttpRequest, Console] e =>  Api e
 hello = do
     r <- get Request
     putStrLn "Hello, Console!"
@@ -34,7 +34,7 @@ getUser = do
     pure $ ok $ JString str
 
 
-api : Has [RequestState, Exception NoRoute, Console ] e => Api e
+api : Has [HttpRequest, Exception NoRoute, Console ] e => Api e
 api = 
     route "api" $ (header $ allowOrigin "*") $ apis 
         [ route "hello" hello

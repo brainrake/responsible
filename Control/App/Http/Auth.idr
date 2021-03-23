@@ -19,7 +19,7 @@ Authorization e =
 
 
 export
-authorized : (RequestState e) => (Authorization e => Api e) -> Api e
+authorized : (HttpRequest e) => (Authorization e => Api e) -> Api e
 authorized api = do
     request <- get Request
     maybe 
@@ -29,6 +29,6 @@ authorized api = do
     
 
 export
-loginJwt : RequestState e => Api e
+loginJwt : HttpRequest e => Api e
 loginJwt =
     pure (ok "NotImplemented")
