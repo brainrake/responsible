@@ -1,4 +1,4 @@
-module Http.Encode
+module Data.Http.Encode
 
 import Language.JSON
 

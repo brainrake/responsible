@@ -40,56 +40,59 @@ api : Has
     , PrimIO
     ] e => Api e
 api = 
-    route "api" $ (header $ allowOrigin "*") $ apis 
-        [ route "hello" hello
-        , route "users" $ apis
+     route "api" $ header (allowOrigin "*") $ concat
+        [ route "hello" $ 
+            hello
+        , routes "users"
             [ post nop
-            , route "login" loginJwt
+            , route "login" $
+                loginJwt
             ]
-        , route "tags" $  get nop
-        , authorized $ apis 
-            [route "user" $ apis
+        , route "tags" $ get nop
+        , authorized $ concat 
+            [ routes "user"
                 [ get getUser
                 , put nop
                 ]
-            , route "profile" $ apis
-                [ param $ \userId => apis
+            , routes "profile"
+                [ param \userId => concat
                     [ get nop
-                    , route "/follow" $ apis
+                    , routes "/follow"
                         [ post nop
                         , delete nop
                         ]
                     ]
                 ]
-            ]
-            , route "articles" $ apis
+            , routes "articles"
                 [ get nop
                 , post nop
-                , param $ \slug_ => apis
+                , param \slug => concat
                     [ get nop
                     , put nop
                     , delete nop
-                    , route "comments" $ apis
+                    , routes "comments"
                         [ get nop
                         , post nop
-                        , param $ \id => apis
+                        , param \id => concat
                             [ delete nop
-                            , get (getComment slug_ id)
+                            , get $ getComment slug id
                             ]
                         ]
-                    , route "favorite" $ apis
+                    , routes "favorite"
                         [ post nop
                         , delete nop
                         ]
                     ]
-                , route "feed" $ get nop
+                , route "feed" $ 
+                    get nop
                 ]
             ]
+        ]
 
 
 server :  App [ Void ] ()
 server =
-    serve "127.0.0.1:8000" api
+    devServer "127.0.0.1:8000" api
 
 
 main : IO ()

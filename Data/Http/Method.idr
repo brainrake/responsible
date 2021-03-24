@@ -1,4 +1,4 @@
-module Http.Method
+module Data.Http.Method
 
 import Data.String.Parser
 

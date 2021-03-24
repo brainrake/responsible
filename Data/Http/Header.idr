@@ -1,4 +1,4 @@
-module Http.Header
+module Data.Http.Header
 
 import Data.List
 import Data.String.Parser

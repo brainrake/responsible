@@ -2,11 +2,11 @@ module Control.App.Http.Auth
 
 import Data.Maybe
 import Data.List
-import Http.Header
-import Http.Request
-import Http.Encode
-import Http.Response
-import Http.Jwt
+import Data.Http.Header
+import Data.Http.Request
+import Data.Http.Encode
+import Data.Http.Response
+import Data.Http.Jwt
 import Control.App
 import Control.App.Context
 import Control.App.Http.Api

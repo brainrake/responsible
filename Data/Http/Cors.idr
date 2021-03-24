@@ -1,7 +1,7 @@
-module Http.Cors
+module Data.Http.Cors
 
 
-import Http.Header
+import Data.Http.Header
 
 
 public export

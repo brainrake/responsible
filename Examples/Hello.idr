@@ -35,31 +35,22 @@ api : Has
     , PrimIO
     ] e => Api e
 api =
-    route "hello" $ apis
+    route "hello" $ concat
         [ get hello
-        , route "post-here" $ post hello
-        , param \name =>
+        , route "post-here" $ 
+            post hello
+        , param $ \name =>
             get $ greet name
-        , authorized $ admin $ pure $ ok "da Truf"
+        , authorized $ admin $ 
+            pure $ ok "da Truf"
         ]
-
-
-api : Has 
-    [ Context Request
-    , State Route String
-    , Exception NoRoute
-    , PrimIO
-    ] e => Api e
-api = do
-    route "api" $ get $ hello
 
 
 server :  App Init ()
 server =
-    serve "127.0.0.1:8000" api
+    devServer "127.0.0.1:8000" api
 
 
 main : IO ()
 main = do
     run server
-    -- run server

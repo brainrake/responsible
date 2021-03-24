@@ -1,11 +1,10 @@
 module Control.App.Http.Api
 
 import Data.Strings
-import Http.Method
-import Http.Header
-import Http.Request
-import Http.Response
-import Http.Error
+import Data.Http.Method
+import Data.Http.Header
+import Data.Http.Request
+import Data.Http.Response
 import Control.App
 import Control.App.Context
 

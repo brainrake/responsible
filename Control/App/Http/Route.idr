@@ -2,9 +2,9 @@ module Control.App.Http.Route
 
 import Data.String.Parser
 import Data.Strings
-import Http.Method
-import Http.Request
-import Http.Response
+import Data.Http.Method
+import Data.Http.Request
+import Data.Http.Response
 import Control.App
 import Control.App.Context
 import Control.App.Http.Api
@@ -21,6 +21,23 @@ data NoRoute =
     MkNoRoute
 
 
+public export
+Exception NoRoute e => Semigroup (Api e) where
+    a <+> b = catch a \MkNoRoute => b
+
+
+public export
+Exception NoRoute e => Monoid (Api e) where
+    neutral = throw MkNoRoute
+
+
+export
+concat : Exception NoRoute e => 
+    List (Api e) -> Api e
+concat apis =
+    concat apis
+
+
 export
 handleNoRoute : Api (NoRoute :: e) -> Api e
 handleNoRoute api =
@@ -34,15 +51,6 @@ router :
     Api e
 router request api =
     newContext request $ new {tag=Route} "" $ handleNoRoute $ api 
-
-
-export
-apis : Exception NoRoute e => 
-    List (Api e) -> Api e
-apis [] =
-    throw MkNoRoute
-apis (x::xs) =
-    catch x \MkNoRoute => apis xs
 
 
 export
@@ -64,13 +72,20 @@ route : Has [ Context Request, State Route String, Exception NoRoute] e =>
     String -> Api e -> Api e
 route str api = do
     request <- getRequest
-    route <- get Route
+    route <- getRoute
     let rest = strSubstr (strLength route) (strLength request.path) request.path
     if ("/" ++ str) `isPrefixOf` rest then do
             modify Route (++ "/" ++ str)
             api
         else
             throw MkNoRoute
+
+
+export
+routes : Has [ Context Request, State Route String, Exception NoRoute] e => 
+    String -> List (Api e) -> Api e
+routes str as =
+    route str $ concat as
 
 
 export
@@ -89,8 +104,8 @@ param f = do
 
 
 export
-method : Has [Context Request, State Route String, Exception NoRoute] e => 
-    Method -> Api e -> Api e
+method : Has [Context Request, State Route String] e => 
+    Method  -> Api e -> (Exception NoRoute e => Api e)
 method m api = do
     request <- getRequest
     route <- getRoute
@@ -100,28 +115,28 @@ method m api = do
 
 
 export
-get : Has [ Context Request, State Route String, Exception NoRoute ] e => 
-    Api e -> Api e
+get : Has [Context Request, State Route String] e => 
+    Api e -> (Exception NoRoute e => Api e)
 get =
     method Get
 
 
 export
-post : Has [ Context Request, State Route String, Exception NoRoute ] e => 
-    Api e -> Api e
+post : Has [Context Request, State Route String] e => 
+    Api e -> (Exception NoRoute e => Api e)
 post =
     method Post
 
 
 export
-put : Has [ Context Request, State Route String, Exception NoRoute ] e => 
-    Api e -> Api e
+put : Has [Context Request, State Route String] e => 
+    Api e -> (Exception NoRoute e => Api e)
 put =
     method Put
 
 
 export
-delete : Has [ Context Request, State Route String, Exception NoRoute ] e => 
-    Api e -> Api e
+delete : Has [Context Request, State Route String] e => 
+    Api e -> (Exception NoRoute e => Api e)
 delete =
     method Delete

@@ -1,9 +1,9 @@
-module Http.Request
+module Data.Http.Request
 
 import Data.String.Parser
-import Http.Method
-import Http.Header
-import Http.Jwt
+import Data.Http.Method
+import Data.Http.Header
+import Data.Http.Jwt
 
 
 public export
@@ -25,7 +25,7 @@ record Request where
 
 parseRequestStartLine : Parser (Method, String)
 parseRequestStartLine =
-    (,) <$> parseMethod <*> takeWhile (/= ' ') <* spaces1 <* string "HTTP/1.0" <* string "\r\n"
+    (,) <$> parseMethod <*> takeWhile (/= ' ') <* spaces1 <* string "HTTP/1." <* (char '0' <|> char '1') <* string "\r\n"
 
 
 public export

@@ -1,4 +1,4 @@
-module Http.NetworkAddress
+module Data.Http.NetworkAddress
 
 import Data.Maybe
 import public Network.Socket

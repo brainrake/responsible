@@ -1,9 +1,9 @@
-module Http.Jwt
+module Data.Http.Jwt
 
 import Data.List
 import Data.Maybe
-import Http.Header
-import Http.Encode
+import Data.Http.Header
+import Data.Http.Encode
 import Control.App
 
 

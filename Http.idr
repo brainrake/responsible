@@ -1,14 +1,13 @@
 module Http
 
-import public Http.Method
-import public Http.Header
-import public Http.Cors
-import public Http.Request
-import public Http.Encode
-import public Http.Response
-import public Http.Error
-import public Http.Jwt
-import public Http.NetworkAddress
+import public Data.Http.Method
+import public Data.Http.Header
+import public Data.Http.Cors
+import public Data.Http.Request
+import public Data.Http.Encode
+import public Data.Http.Response
+import public Data.Http.Jwt
+import public Data.Http.NetworkAddress
 import public Control.App.Context
 import public Control.App.Http.Api
 import public Control.App.Http.Route

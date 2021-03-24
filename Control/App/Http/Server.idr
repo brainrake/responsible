@@ -3,12 +3,11 @@ module Control.App.Http.Server
 import Data.Maybe
 import Data.String.Parser
 import Data.Strings
-import Http.Method
-import Http.Header
-import Http.Request
-import Http.Response
-import Http.Error
-import Http.NetworkAddress
+import Data.Http.Method
+import Data.Http.Header
+import Data.Http.Request
+import Data.Http.Response
+import Data.Http.NetworkAddress
 import Control.App
 import Control.App.Console
 import Control.App.Context
@@ -53,28 +52,50 @@ handle sock addr api = do
 
 
 loop : 
-    Socket 
-    -> (Has [ HttpRequest ] e => Api (NoRoute :: e)) 
-    -> Has [ PrimIO ] e => App {l=MayThrow} e ()
+    Socket -> 
+    (forall e1. Has [Context Request, State Route String, PrimIO ] e1 => Api (NoRoute :: e1)) ->
+    (PrimIO e2 => App {l=MayThrow} e2 ())
 loop listenSock api = do
     Right (sock, addr) <- primIO $ accept listenSock
     | Left err => primIO $ putStrLn ("Error accepting socket: " ++ show err)
-    handle api sock addr
+    -- -- socket error after several connections
+    -- fork $ handle sock addr api
+    handle sock addr api
     loop listenSock api
 
 
+tryServe : 
+    Int ->
+    NetworkAddress ->
+    (forall e1. Has [ Context Request, State Route String, PrimIO ] e1 => Api (NoRoute :: e1)) ->
+    (PrimIO e2 => App {l=MayThrow} e2 ())
+tryServe tries (addr, port) api =
+    if not (tries >= 0) then
+        putStrLn $ "Error creating socket."
+    else do
+        Right sock <- primIO $ socket AF_INET Stream 0
+        | Left err => do
+            putStrLn $ "Port " ++ show port ++ "Error creating socket: " ++ show err
+            tryServe (tries - 1) (addr, port + 1) api 
+        0 <- primIO $ bind sock (Just addr) port
+        | n => do
+            putStrLn $ "Error binding socket. errno=" ++ show n
+            primIO $ close sock
+            tryServe (tries - 1) (addr, port + 1) api 
+        0 <- primIO $ listen sock
+        | n => do
+            putStrLn $ "Error listening on socket. errno=" ++ show n
+            primIO $ close sock
+            tryServe (tries - 1) (addr, port + 1) api 
+        putStrLn $ "Listening on " ++ show addr ++ ":" ++ show port
+        loop sock api
+        primIO $ close sock
+
+
 export
-serve :  
-    NetworkAddress 
-    -> (Has [ HttpRequest ] e => Api (NoRoute :: e)) 
-    -> (Has [ PrimIO ] e => App {l=MayThrow} e ())
-serve (addr, port) api = do
-    Right sock <- primIO $ socket AF_INET Stream 0
-    | Left err => primIO $ putStrLn $ "Error creating socket: " ++ show err
-    0 <- primIO $ bind sock (Just addr) port
-    | n => primIO $ putStrLn $ "Error binding socket. errno=" ++ show n
-    0 <- primIO $ listen sock
-    | n => primIO $ putStrLn $ "Error listening on socket. errno=" ++ show n
-    primIO $ putStrLn $ "Listening on " ++ show addr ++ ":" ++ show port
-    loop sock api
-    primIO $ close sock
+devServer :  
+    NetworkAddress  ->
+    (forall e1. Has [ Context Request, State Route String, PrimIO ] e1 => Api (NoRoute :: e1)) ->
+    (PrimIO e2 => App {l=MayThrow} e2 ())
+devServer addr api =
+    tryServe 10 addr api

@@ -1,8 +1,8 @@
-module Http.Response
+module Data.Http.Response
 
 import Data.List
-import Http.Header
-import Http.Encode
+import Data.Http.Header
+import Data.Http.Encode
 import Language.JSON
 
 
