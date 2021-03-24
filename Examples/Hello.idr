@@ -21,21 +21,45 @@ greet name =
     pure $ ok $ "Hello, " ++ name ++ "!"
 
 
-api : Has [HttpRequest, Exception NoRoute, Console ] e => Api e
+admin : Has [ Context Token ] e => Api e -> Api e
+admin api = do
+    MkToken "admin" <- getToken
+    | _ => pure forbidden
+    api
+
+
+api : Has 
+    [ Context Request
+    , State Route String
+    , Exception NoRoute
+    , PrimIO
+    ] e => Api e
 api =
     route "hello" $ apis
         [ get hello
         , route "post-here" $ post hello
         , param \name =>
-            get (greet name)
+            get $ greet name
+        , authorized $ admin $ pure $ ok "da Truf"
         ]
 
 
-server :  App [ Void ] ()
+api : Has 
+    [ Context Request
+    , State Route String
+    , Exception NoRoute
+    , PrimIO
+    ] e => Api e
+api = do
+    route "api" $ get $ hello
+
+
+server :  App Init ()
 server =
     serve "127.0.0.1:8000" api
 
 
 main : IO ()
-main =
+main = do
     run server
+    -- run server
