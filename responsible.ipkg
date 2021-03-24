@@ -10,6 +10,7 @@ modules =
     Http.Response,
     Http.Jwt,
     Http.NetworkAddress,
+    Control.App.Context,
     Control.App.Http.Route,
     Control.App.Http.Api,
     Control.App.Http.Auth,

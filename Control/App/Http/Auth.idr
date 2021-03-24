@@ -8,26 +8,28 @@ import Http.Encode
 import Http.Response
 import Http.Jwt
 import Control.App
+import Control.App.Context
 import Control.App.Http.Api
-
-
-public export
-Authorization : List Error -> Type
-Authorization e =
-    State Token Token e
+import Control.App.Http.Route
 
 
 export
-authorized : (HttpRequest e) => (Authorization e => Api e) -> Api e
+authorized : Context Request e => (Context Token e => Api e) -> Api e
 authorized api = do
-    request <- get Request
+    request <- getRequest
     maybe 
         (pure unauthorized) 
-        (\token => new token api)
+        (\token => newContext token api)
         (lookup "Authorization" request.headers >>= parseJwt)
-    
+
 
 export
-loginJwt : HttpRequest e => Api e
+getToken : Context Token e => App e Token
+getToken =
+    getContext Token
+
+
+export
+loginJwt : Context Request e => Api e
 loginJwt =
-    pure (ok "NotImplemented")
+    pure (ok "Not Implemented")

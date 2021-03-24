@@ -21,7 +21,7 @@ httpVersion = "HTTP/1.1"
 
 statusLine : Int -> String
 statusLine code =
-    httpVersion ++ " " ++ show code ++ "reason" ++ "\r\n"
+    httpVersion ++ " " ++ show code ++ " " ++ "Unknown" ++ "\r\n"
 
 
 export
@@ -88,3 +88,8 @@ export
 setResponseHeader : Header -> Response -> Response
 setResponseHeader header =
     { headers $= setHeader header }
+
+export
+setResponseHeaders : Headers -> Response -> Response
+setResponseHeaders headers =
+    { headers $= \hs => foldr setHeader hs headers  }

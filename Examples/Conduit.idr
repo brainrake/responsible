@@ -9,12 +9,12 @@ import Network.Socket
 import Http
 
 
-hello : Has [HttpRequest, Console ] e =>  Api e
+hello : Has [ Context Request, Console ] e =>  Api e
 hello = do
-    r <- get Request
+    r <- getRequest
     putStrLn "Hello, Console!"
     printLn r.headers
-    pure $ ok $ "Hello, Http! " ++ r.fullPath
+    pure $ ok $ "Hello, Http! " ++ r.path
  
 
 nop : Api e
@@ -27,13 +27,18 @@ getComment slug id =
     pure $ ok  $ JObject [("slug", JString slug), ("id", JString id)]
 
 
-getUser : Has [ Authorization ] e => Api e
+getUser : Context Token e => Api e
 getUser = do
-    (MkToken str) <- get Token
+    (MkToken str) <- getToken
     pure $ ok $ JString str
 
 
-api : Has [HttpRequest, Exception NoRoute, Console ] e => Api e
+api : Has 
+    [ Context Request
+    , State Route String
+    , Exception NoRoute
+    , PrimIO
+    ] e => Api e
 api = 
     route "api" $ (header $ allowOrigin "*") $ apis 
         [ route "hello" hello
@@ -41,7 +46,6 @@ api =
             [ post nop
             , route "login" loginJwt
             ]
-        , route "asd" $ get nop
         , route "tags" $  get nop
         , authorized $ apis 
             [route "user" $ apis

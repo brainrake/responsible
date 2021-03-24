@@ -3,25 +3,35 @@ module Control.App.Http.Server
 import Data.Maybe
 import Data.String.Parser
 import Data.Strings
-import Control.App
-import Control.App.Console
 import Http.Method
 import Http.Header
 import Http.Request
 import Http.Response
 import Http.Error
 import Http.NetworkAddress
+import Control.App
+import Control.App.Console
+import Control.App.Context
 import Control.App.Http.Route
 import Control.App.Http.Api
 import Network.Socket
 
 
+-- help instance resoltuion for fork
+%hint
+export
+PrimIO e =>PrimIO (NoRoute :: e) where
+    primIO = primIO
+    primIO1 = primIO1
+    fork = fork
+
+
 handle : 
-    (Has [ HttpRequest ] e => Api (NoRoute :: e))
-    -> Socket 
-    -> SocketAddress 
-    -> (Has [PrimIO] e => App e ())
-handle api sock addr = do
+    Socket ->  
+    SocketAddress -> 
+    (Has [ Context Request, State Route String, PrimIO ] e => Api (NoRoute :: e)) ->
+    (PrimIO e => App e ())
+handle sock addr api = do
     Right requestStr <- primIO $ recvAll sock
     | Left err => primIO $ putStrLn $ "Error receiving from socket: " ++ show err
     let (Just request) = decodeRequest requestStr
@@ -31,7 +41,8 @@ handle api sock addr = do
         | Right _ => pure ()
         primIO $ putStrLn err
         primIO $ printLn requestStr
-    response <- new request (handleNoRoute api)
+        primIO $ close sock
+    response <- router request api
     let contentLength = strLength response.body
     let fullResponse =
         setResponseHeader ("Content-Length", show contentLength) response

@@ -16,29 +16,22 @@ public export
 record Request where
     constructor MkRequest
     method : Method
-    fullPath : String
     path : String
     params : List (String, String)
     query : Query
     headers : Headers
-    token : Maybe Token
     body : String
-
-
-tup : a -> b -> (a, b)
-tup x y =
-    (x, y)
 
 
 parseRequestStartLine : Parser (Method, String)
 parseRequestStartLine =
-    tup <$> parseMethod <*> takeWhile (/= ' ') <* spaces1 <* string "HTTP/1.1" <* string "\r\n"
+    (,) <$> parseMethod <*> takeWhile (/= ' ') <* spaces1 <* string "HTTP/1.0" <* string "\r\n"
 
 
 public export
 parseRequest : Parser Request
 parseRequest =
-    (\(m, p) => \h => \b => MkRequest m p p [] [] h Nothing b)
+    (\(m, p) => \h => \b => MkRequest m p [] [] h b)
         <$> parseRequestStartLine <*> parseHeaders <*> takeWhile (\_ => True) <* eos
 
 

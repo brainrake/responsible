@@ -7,12 +7,7 @@ import Http.Request
 import Http.Response
 import Http.Error
 import Control.App
-
-
-public export
-HttpRequest : List Error -> Type
-HttpRequest e =
-    State Request Request e
+import Control.App.Context
 
 
 public export
@@ -22,39 +17,18 @@ Api e =
 
 
 export
-method : HttpRequest e => Method -> Api e -> Api e
-method m api = do
-    request <- get Request
-    if request.method == m
-        then api
-        else pure notFound
-
-
-export
-get : HttpRequest e => Api e -> Api e
-get =
-    method Get
-
-
-export
-post : HttpRequest e => Api e -> Api e
-post =
-    method Post
-
-
-export
-put : HttpRequest e => Api e -> Api e
-put =
-    method Put
-
-
-export
-delete : HttpRequest e => Api e -> Api e
-delete =
-    method Delete
+middlewares : List (Api e -> Api e) -> Api e -> Api e
+middlewares xs api =
+    foldr apply api xs
 
 
 export
 header : Header -> Api e -> Api e
 header h api =
     api >>= \r => pure $ setResponseHeader h r 
+
+
+export
+headers : Headers -> Api e -> Api e
+headers h api =
+    api >>= \r => pure $ setResponseHeaders h r 

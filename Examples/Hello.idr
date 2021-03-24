@@ -6,13 +6,14 @@ import Control.App.Console
 import Http
 
 
-hello : Has [HttpRequest, Console] e => Api e
+hello : Has [ Context Request, Console ] e => Api e
 hello = do
-    r <- get Request
+    r <- getRequest
     putStrLn "Hello, Console!"
+    putStr "Headers: "
     printLn r.headers
     header ("test", "test") $ do
-        pure $ ok $ "Hello, Http! " ++ r.fullPath
+        pure $ ok $ "Hello, Http! " ++ r.path
  
 
 greet : String -> Api e
