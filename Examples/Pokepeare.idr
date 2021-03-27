@@ -1,6 +1,5 @@
 import Data.Result
-import Control.App
-import Http
+import Control.App.Http.Nodejs
 import CommandLine
 
 
@@ -28,7 +27,7 @@ pokepeare name = do
 
 
 main : IO ()
-main =
+main = do
     (host, port) <- 
         commandLine "Convert Pokemons to Hamlet" <$> (,) 
             <$> optional "i" "ip" $ IPv4Addr 127 0 0 1
