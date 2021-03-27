@@ -24,7 +24,7 @@ pokepeare name = do
     description <- handleError "shakespeare translation" $ do
         postJson shakespeareUrl $ toJson [ ( "text", storyText ) ] $ at [ "contents", "transated" ] string
 
-    pure $ ok $ jsonObject [ ( "name", name ), ( "description", description ) ]
+    pure $ ok $ toJson [ ( "name", name ), ( "description", description ) ]
 
 
 main : IO ()
