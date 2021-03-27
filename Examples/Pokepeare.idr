@@ -1,27 +1,28 @@
+import Data.Result
+import Control.App
 import Http
 import CommandLine
 
 
-pokepeare :String -> Api e
+handleError : String -> App e (Result HttpError r) -> App e r
+handleError _ (Ok x) = pure $ x
+handleError _ (Err (BadCode 404 _)) = throwNotFound
+handleError thing (Err err) = throwHttpError $ { body := "Error requesting " ++ thing ++ ": " ++ show err } badGateway
+
+
+pokepeare : HasErr HttpError e => String -> Api e
 pokepeare name = do
     let pokemonUrl = "https://pokeapi.co/api/v2/pokemon/" 
     let shakespeareUrl = "https://api.funtranslations.com/translate/shakespeare.json"
-
-    Right pokemonJson <- getJson $ pokemonUrl ++ name
-    | Left (BadCode 404 _) => pure $ notFound
-    | Left err => pure $ { body := "Error getting pokemon: " ++ show err } badGateway
-    let Just (JString speciesUrl) = at [ "species" "url" ] pokemonJson
-    | _ => pure $ { body := "Error decoding species url." } badGateway
     
-    Right speciesJson <- getJson speciesUrl
-    | Left err => pure $ { body := "Error getting species: " ++ show err ] badGateway
-    let Just (JString storyText) = at [ "flavor_text_entries", "0", "flavor_text" ] speciesJson
-    | _ => pure $ { body := "Error decoding story text." } badGateway
+    speciesUrl <- handleError "pokemon" do
+        getJson $ pokemonUrl ++ name $ at ["species" "url"] string
+    
+    storyText <- handleError "story text" $ do
+        getJson speciesUrl $ at [ "flavor_text_entries", "0", "flavor_text" ] string
 
-    Right shakespeareJson <- postJson shakespeareUrl $ jsonObject [ ( "text", storyText ) ]
-    Left err => pure $ { body := "Error requesting sakespeare translation: " ++ show err } badGateway
-    let Just (JString description) = at [ "contents" "translated" ] shakespeareJson
-    | _ => pure $ { body := "Error decoding shakespeare translation" }
+    description <- handleError "shakespeare translation" $ do
+        postJson shakespeareUrl $ toJson [ ( "text", storyText ) ] $ at [ "contents", "transated" ] string
 
     pure $ ok $ jsonObject [ ( "name", name ), ( "description", description ) ]
 
