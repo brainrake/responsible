@@ -27,7 +27,7 @@ pokepeare name = do
     pure $ ok $ jsonObject [ ( "name", name ), ( "description", description ) ]
 
 
-main : IO
+main : IO ()
 main =
     (host, port) <- 
         commandLine "Convert Pokemons to Hamlet" <$> (,) 
