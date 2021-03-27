@@ -4,13 +4,13 @@ import Http
 import CommandLine
 
 
-handleError : String -> App e (Result HttpError r) -> HasErr HttpError e => App e r
+handleError : String -> App e (Result HttpError r) -> Exception HttpException e => App e r
 handleError _ (Ok x) = pure $ x
 handleError _ (Err (BadCode 404 _)) = throwNotFound
 handleError thing (Err err) = throwHttpError $ { body := "Error requesting " ++ thing ++ ": " ++ show err } badGateway
 
 
-pokepeare : HasErr HttpError e => String -> Api e
+pokepeare : Exception HttpExcetion e => String -> Api e
 pokepeare name = do
     let pokemonUrl = "https://pokeapi.co/api/v2/pokemon/" 
     let shakespeareUrl = "https://api.funtranslations.com/translate/shakespeare.json"
