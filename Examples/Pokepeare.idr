@@ -29,9 +29,9 @@ pokepeare name = do
 main : IO
 main =
     (host, port) <- 
-        options "Convert Pokemons to Hamlet" <$> (,) 
-            <$> opt "i" "ip" $ IPv4Addr 127 0 0 1
-            <*> opt "p" "port" 8000 
+        commandLine "Convert Pokemons to Hamlet" <$> (,) 
+            <$> optional "i" "ip" $ IPv4Addr 127 0 0 1
+            <*> optional "p" "port" 8000 
     nodeServer (host, port) do 
         route "pokemon" $ param \name => 
             get $ pokepeare name
