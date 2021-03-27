@@ -28,7 +28,7 @@ pokepeare name = do
 
 main : IO
 main =
-    (ip, port) <- 
+    (host, port) <- 
         options "Convert Pokemons to Hamlet" <$> (,) 
             <$> opt "i" "ip" $ IPv4Addr 127 0 0 1
             <*> opt "p" "port" 8000 
