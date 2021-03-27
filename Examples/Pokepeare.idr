@@ -4,7 +4,7 @@ import Http
 import CommandLine
 
 
-handleError : String -> App e (Result HttpError r) -> App e r
+handleError : String -> App e (Result HttpError r) -> HasErr HttpError e => App e r
 handleError _ (Ok x) = pure $ x
 handleError _ (Err (BadCode 404 _)) = throwNotFound
 handleError thing (Err err) = throwHttpError $ { body := "Error requesting " ++ thing ++ ": " ++ show err } badGateway
