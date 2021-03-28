@@ -32,7 +32,7 @@ main = do
         commandLine "Convert Pokemons to Hamlet" <$> (,) 
             <$> optional "i" "ip" $ IPv4Addr 127 0 0 1
             <*> optional "p" "port" 8000 
-    nodeServer (host, port) do 
+    nodeServer (host, port) $ do 
         route "pokemon" $ param \name => 
             get $ pokepeare name
 
@@ -40,5 +40,5 @@ main = do
 namespace Test
     main : IO ()
     main = printLn $ do
-        response <- run $ pokepeare "bulbasaur"
-        putStrLn $ response.body == jsonObject [ ( "name", "bulbasaur" ), ( "description", "A strange seed wast planted on its back at birth. The plant sprouts and grows with this pokémon." )]
+        response <- run pokepeare "bulbasaur"
+        putStrLn $ response.body == toJson [ ( "name", "bulbasaur" ), ( "description", "A strange seed wast planted on its back at birth. The plant sprouts and grows with this pokémon." )]
