@@ -1,19 +1,19 @@
 module Examples.Conduit
 
+import Http
+import Control.App
+import Control.App.Log
 import Data.Maybe
 import Data.List
+import Data.Http.Request
 import Language.JSON
-import Control.App
-import Control.App.Console
-import Network.Socket
-import Http
 
 
-hello : Has [ Context Request, Console ] e =>  Api e
+hello : Has [ Context Request, Log ] e =>  Api e
 hello = do
     r <- getRequest
-    putStrLn "Hello, Console!"
-    printLn r.headers
+    -- -- crash:
+    -- logStr "Hello, Console!"
     pure $ ok $ "Hello, Http! " ++ r.path
  
 
@@ -27,19 +27,24 @@ getComment slug id =
     pure $ ok  $ JObject [("slug", JString slug), ("id", JString id)]
 
 
-getUser : Context Token e => Api e
-getUser = do
+getUser : String -> Api e
+getUser userId = 
+    pure $ ok $ JString userId
+
+
+getCurrentUser : Context Token e => Api e
+getCurrentUser = do
     (MkToken str) <- getToken
-    pure $ ok $ JString str
+    getUser str
 
 
 api : Has 
     [ Context Request
     , State Route String
     , Exception NoRoute
-    , PrimIO
+    , Log
     ] e => Api e
-api = 
+api = with Control.App.Http.Route.get do 
      route "api" $ header (allowOrigin "*") $ concat
         [ route "hello" $ 
             hello
@@ -51,13 +56,13 @@ api =
         , route "tags" $ get nop
         , authorized $ concat 
             [ routes "user"
-                [ get getUser
+                [ get getCurrentUser
                 , put nop
                 ]
             , routes "profile"
-                [ param \userId => concat
+                [ param $ \userId => concat
                     [ get nop
-                    , routes "/follow"
+                    , routes "follow"
                         [ post nop
                         , delete nop
                         ]
@@ -66,14 +71,14 @@ api =
             , routes "articles"
                 [ get nop
                 , post nop
-                , param \slug => concat
+                , param $ \slug => concat
                     [ get nop
                     , put nop
                     , delete nop
                     , routes "comments"
                         [ get nop
                         , post nop
-                        , param \id => concat
+                        , param $ \id => concat
                             [ delete nop
                             , get $ getComment slug id
                             ]
@@ -90,11 +95,6 @@ api =
         ]
 
 
-server :  App [ Void ] ()
-server =
-    devServer "127.0.0.1:8000" api
-
-
 main : IO ()
 main =
-    run server
+    run $ devServer "127.0.0.1:8000" api

@@ -1,13 +1,14 @@
-module Examples.Hello
+module Examples.HelloNode
 
 import Http
+import Control.App.Http.Server.Nodejs
 
 
 hello : Has [ Context Request, Log ] e => Api e
 hello = do
     r <- getRequest
     -- -- crash:
-    --logStr "Hello, Console!"
+    -- logStr "Hello, Console!"
     --logStr "Headers: "
     --log r.headers
     header ("test", "test") $ do
@@ -48,4 +49,4 @@ api = with Control.App.Http.Route.get do
 
 main : IO ()
 main = do
-    run $ devServer "127.0.0.1:8000" api
+    nodeServer "127.0.0.1:8000" api

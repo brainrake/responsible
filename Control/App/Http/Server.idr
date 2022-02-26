@@ -2,7 +2,7 @@ module Control.App.Http.Server
 
 import Data.Maybe
 import Data.String.Parser
-import Data.Strings
+import Data.String
 import Data.Http.Method
 import Data.Http.Header
 import Data.Http.Request
@@ -19,7 +19,7 @@ import Network.Socket
 -- help instance resoltuion for fork
 %hint
 export
-PrimIO e =>PrimIO (NoRoute :: e) where
+PrimIO e =>PrimIO (e' :: e) where
     primIO = primIO
     primIO1 = primIO1
     fork = fork
@@ -46,9 +46,10 @@ handle sock addr api = do
     let fullResponse =
         setResponseHeader ("Content-Length", show contentLength) response
     let responseStr = encodeResponse response
-    primIO $ send sock responseStr
+    Right _ <- primIO $ send sock responseStr
+    | Left err => primIO $ putStrLn $ "Error sending on socket: " ++ show err
     putStrLn $ show addr ++ " " ++ request.path ++ " " ++ show request.method ++ " " ++ show response.code
-    primIO $ close sock    
+    primIO $ close sock
 
 
 loop : 
@@ -87,7 +88,7 @@ tryServe tries (addr, port) api =
             putStrLn $ "Error listening on socket. errno=" ++ show n
             primIO $ close sock
             tryServe (tries - 1) (addr, port + 1) api 
-        putStrLn $ "Listening on " ++ show addr ++ ":" ++ show port
+        putStrLn $ "Listening on http://" ++ show addr ++ ":" ++ show port ++ "/"
         loop sock api
         primIO $ close sock
 

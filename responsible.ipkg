@@ -1,19 +1,23 @@
-package topdown
-version = "1.0.0"
+package responsible
+version = 1.0.0
 executable = hello
-main = Examples.Conduit
+main = Examples.Hello
 modules = 
-    Data.Http.Method,
-    Data.Http.Header,
-    Data.Http.Request,
-    Data.Http.Response,
-    Data.Http.Jwt,
-    Data.Http.NetworkAddress,
     Control.App.Context,
-    Control.App.Http.Route,
     Control.App.Http.Api,
     Control.App.Http.Auth,
-    Control.App.Http.Server
-          
+    Control.App.Http.Error,
+    Control.App.Http.Route,
+    Control.App.Http.Server,
+    Control.App.Log,
+    Data.Http.Cors,
+    Data.Http.Encode,
+    Data.Http.Header,
+    Data.Http.Jwt,
+    Data.Http.Method,
+    Data.Http.NetworkAddress,
+    Data.Http.Request,
+    Data.Http.Response,
+    Http
 
-depends = base,contrib,network
+depends = base,contrib,network --,idris-nodejs

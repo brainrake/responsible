@@ -17,7 +17,6 @@ record Request where
     constructor MkRequest
     method : Method
     path : String
-    params : List (String, String)
     query : Query
     headers : Headers
     body : String
@@ -31,7 +30,7 @@ parseRequestStartLine =
 public export
 parseRequest : Parser Request
 parseRequest =
-    (\(m, p) => \h => \b => MkRequest m p [] [] h b)
+    (\(m, p) => \h => \b => MkRequest m p [] h b)
         <$> parseRequestStartLine <*> parseHeaders <*> takeWhile (\_ => True) <* eos
 
 

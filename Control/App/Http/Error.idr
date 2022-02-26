@@ -9,12 +9,12 @@ data HttpError =
     MkHttpError Response
 
 
-throwHttpError : HasErr HttpError e => Response -> App e r
+throwHttpError : Exception HttpError e => Response -> App e r
 throwHttpError response =
     throw (MkHttpError response)
 
 
 export
-throwBadGateway : HasErr HttpError e => App e r
+throwBadGateway : Exception  HttpError e => App e r
 throwBadGateway =
-    throw badGateway
+    throw (MkHttpError badGateway)

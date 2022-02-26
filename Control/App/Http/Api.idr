@@ -1,6 +1,6 @@
 module Control.App.Http.Api
 
-import Data.Strings
+import Data.String
 import Data.Http.Method
 import Data.Http.Header
 import Data.Http.Request

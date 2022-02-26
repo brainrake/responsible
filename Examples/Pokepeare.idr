@@ -1,6 +1,6 @@
-import Data.Result
-import Control.App.Http.Nodejs
+import Http
 import CommandLine
+import Json
 
 
 handleError : String -> App e (Result HttpError r) -> Exception HttpException e => App e r
@@ -9,7 +9,7 @@ handleError _ (Err (BadCode 404 _)) = throwNotFound
 handleError thing (Err err) = throwHttpError $ { body := "Error requesting " ++ thing ++ ": " ++ show err } badGateway
 
 
-pokepeare : Exception HttpExcetion e => String -> Api e
+pokepeare : HasErr HttpExcetion e => String -> Api e
 pokepeare name = do
     let pokemonUrl = "https://pokeapi.co/api/v2/pokemon/" 
     let shakespeareUrl = "https://api.funtranslations.com/translate/shakespeare.json"
@@ -32,7 +32,7 @@ main = do
         commandLine "Convert Pokemons to Hamlet" <$> (,) 
             <$> optional "i" "ip" $ IPv4Addr 127 0 0 1
             <*> optional "p" "port" 8000 
-    nodeServer (host, port) $ do 
+    devServer (host, port) $ do 
         route "pokemon" $ param \name => 
             get $ pokepeare name
 
@@ -40,5 +40,5 @@ main = do
 namespace Test
     main : IO ()
     main = printLn $ do
-        response <- run pokepeare "bulbasaur"
+        response <- run $ pokepeare "bulbasaur"
         putStrLn $ response.body == toJson [ ( "name", "bulbasaur" ), ( "description", "A strange seed wast planted on its back at birth. The plant sprouts and grows with this pokémon." )]

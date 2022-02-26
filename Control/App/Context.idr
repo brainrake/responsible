@@ -26,7 +26,9 @@ export
 newContext : t -> (p: Context t e => App {l} e a) -> App {l} e a
 newContext val prog =
     MkApp $
-        prim_app_bind (toPrimApp $ newIORef val) $ \ref => do
-            let  c = MkContext ref
-            let MkApp res = prog @{c}
-            res
+        prim_app_bind (toPrimApp $ newIORef val) $ \ref =>
+            let 
+                c = MkContext ref
+                MkApp res = prog @{c}
+            in
+                res

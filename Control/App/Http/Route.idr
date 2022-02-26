@@ -1,7 +1,7 @@
 module Control.App.Http.Route
 
 import Data.String.Parser
-import Data.Strings
+import Data.String
 import Data.Http.Method
 import Data.Http.Request
 import Data.Http.Response
@@ -23,7 +23,7 @@ data NoRoute =
 
 public export
 Exception NoRoute e => Semigroup (Api e) where
-    a <+> b = catch a \MkNoRoute => b
+    a <+> b = catch a (\MkNoRoute => b)
 
 
 public export
@@ -35,14 +35,14 @@ export
 concat : Exception NoRoute e => 
     List (Api e) -> Api e
 concat apis =
-    concat apis
+    foldr (<+>) (throw MkNoRoute) apis
 
 
 export
 handleNoRoute : Api (NoRoute :: e) -> Api e
 handleNoRoute api =
-    handle api pure (\MkNoRoute  => pure notFound)
-    
+    handle api pure (\MkNoRoute => pure notFound)
+
 
 export
 router : 
@@ -68,17 +68,16 @@ getRoute =
 
 
 export
-route : Has [ Context Request, State Route String, Exception NoRoute] e => 
+route : Has [ Context Request, State Route String, Exception NoRoute ] e => 
     String -> Api e -> Api e
-route str api = do
+route urlPart api = do
     request <- getRequest
     route <- getRoute
     let rest = strSubstr (strLength route) (strLength request.path) request.path
-    if ("/" ++ str) `isPrefixOf` rest then do
-            modify Route (++ "/" ++ str)
-            api
-        else
-            throw MkNoRoute
+    let True = ("/" ++ urlPart) `isPrefixOf` rest
+    | _ => throw MkNoRoute
+    modify Route (++ "/" ++ urlPart)
+    api
 
 
 export
@@ -96,7 +95,7 @@ param f = do
     route <- getRoute
     let rest = strSubstr (strLength route) (strLength request.path) request.path
     let parser = char '/' *> takeWhile1 (/= '/')
-    let (Right (param, len)) = parse parser rest
+    let Right (param, len) = parse parser rest
     | _ => throw MkNoRoute
     modify Route (++ "/" ++ param)
     newRoute <- getRoute
@@ -105,13 +104,13 @@ param f = do
 
 export
 method : Has [Context Request, State Route String] e => 
-    Method  -> Api e -> (Exception NoRoute e => Api e)
+    Method -> Api e -> (Exception NoRoute e => Api e)
 method m api = do
     request <- getRequest
     route <- getRoute
-    if request.method == m && request.path == route
-        then api
-        else throw MkNoRoute
+    let True = request.method == m && request.path == route
+    | _ => throw MkNoRoute
+    api
 
 
 export

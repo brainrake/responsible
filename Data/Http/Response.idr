@@ -85,9 +85,16 @@ serverError =
 
 
 export
+badGateway : Response
+badGateway = 
+    MkResponse 502 [] ""
+
+
+export
 setResponseHeader : Header -> Response -> Response
 setResponseHeader header =
     { headers $= setHeader header }
+
 
 export
 setResponseHeaders : Headers -> Response -> Response
