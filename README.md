@@ -19,16 +19,15 @@ main = with Control.App.Http.Route.get do
             ]         
 ```
 
-### Build and Run
+See more [Examples](Examples/).
+
+### Build and Run Example
 
 Prerequisites: `idris2`
 
 ```
 ./run.sh
 ```
-
-### What?
-
 
 
 ### Current State
